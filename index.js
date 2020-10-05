@@ -33,68 +33,60 @@ client.connect(err => {
 
     console.log("database connected successfully");
 
+    // ADDING TASKS BY USER
     app.post('/addTask', (req, res) => {
         const task = req.body;
-        // console.log(task);
+        console.log(task);
         taskChosenCollection.insertOne(task)
             .then(result => {
-                // console.log(result);
+                console.log(result);
                 res.send(result.insertedCount > 0);
             })
     })
-
+    // ADDING TASK TO ALL TASKS
+    app.post('/allTask', (req, res) => {
+        const task = req.body;
+        console.log(task);
+        taskCollection.insertOne(task)
+            .then(result => {
+                console.log(result);
+                res.send(result.insertedCount > 0);
+            })
+    })
+//   GETTING ALL TASKS
     app.get('/allTask', (req, res) => {
         taskCollection.find({})
             .toArray((err, documents) => {
                 res.send(documents);
             })
     })
-    app.get('/allTask/:name', (req, res) => {
-        taskChosenCollection.find({ name: req.params.name })
+    // GETTING ADDED TASKS BY USER
+    app.get('/addTask', (req, res) => {
+        taskChosenCollection.find({ })
             .toArray((err, documents) => {
                 console.log(documents);
                 res.send(documents);
             })
     })
-    app.get('/allTask/email', (req, res) => {
-        taskChosenCollection.filter({email: req.params.email})
+    app.get('/addTask/:email', (req, res) => {
+        taskChosenCollection.find({email: req.params.email})
         .toArray( (err , documents) => {
-            console.log(documents);
-            res.send(documents);
-        // const bearer = req.headers.authorization;
-        // if (bearer && bearer.startsWith('Bearer ')) {
-        //     const idToken = bearer.split(' ');
-        //     console.log({ idToken });
-        //     admin.auth().verifyIdToken(idToken)
-        //         .then(function (decodedToken) {
-        //             let tokenEmail = decodedToken.email;
-        //             const queryEmail = req.query.email;
-        //             console.log(tokenEmail , queryEmail);
-        //             if (tokenEmail == queryEmail) {
-        //                 taskChosenCollection.find({ email: queryEmail })
-        //                     .toArray((err, documents) => {
-        //                         res.status(200).send(documents);
-        //                     })
-        //             }
-        //             else {
-        //                 res.status(401).send('unauthorized access');
-        //             }
-
-
-        //         }).catch(function (error) {
-        //             console.log(error);
-        //         });
-        // }
-        else {
-            res.status(401).send('unauthorized access');
-        }
-
+            // console.log(documents);
+            res.status(200).send(documents);
     })
+});
+//   DELETE
+app.delete('/delete/:id', (req, res) => { // delete register volunteer
+    taskChosenCollection.deleteOne({ _id: req.params.id})
+        .then(result => {
+            console.log(result);
+            res.status(200).send(result.deletedCount > 0);
+        })
 })
+});
 
 
 
 
 
-
-app.listen(port);
+app.listen(port)
