@@ -1,7 +1,6 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const admin = require('firebase-admin');
 const port = 5000;
 require('dotenv').config()
 
@@ -15,12 +14,7 @@ const app = express()
 app.use(bodyParser.json())
 app.use(cors())
 
-const serviceAccount = require("./volunteer-network-bysubreena-firebase-adminsdk-e7msw-cf58e9eae7.json");
 
-admin.initializeApp({
-    credential: admin.credential.applicationDefault(serviceAccount),
-    databaseURL: `https://${process.env.DB_NAME}.firebaseio.com`
-});
 
 app.get('/', (req, res) => {
     res.send('Hello from volunter-network db. Everything is fine here up to now!');
@@ -28,8 +22,8 @@ app.get('/', (req, res) => {
 
 
 client.connect(err => {
-    const taskCollection = client.db("volunteerNetwork").collection("tasks");
-    const taskChosenCollection = client.db("volunteerNetwork").collection("taskChosen");
+    const taskCollection = client.db(`${process.env.DB_NAME}`).collection("tasks");
+    const taskChosenCollection = client.db(`${process.env.DB_NAME}`).collection("taskChosen");
 
     console.log("database connected successfully");
 
@@ -40,7 +34,7 @@ client.connect(err => {
         taskChosenCollection.insertOne(task)
             .then(result => {
                 console.log(result);
-                res.send(result.insertedCount > 0);
+                res.status(200).send(result.insertedCount > 0);
             })
     })
     // ADDING TASK TO ALL TASKS
@@ -50,14 +44,14 @@ client.connect(err => {
         taskCollection.insertOne(task)
             .then(result => {
                 console.log(result);
-                res.send(result.insertedCount > 0);
+                res.status(200).send(result.insertedCount > 0);
             })
     })
 //   GETTING ALL TASKS
     app.get('/allTask', (req, res) => {
         taskCollection.find({})
             .toArray((err, documents) => {
-                res.send(documents);
+                res.status(200).send(documents);
             })
     })
     // GETTING ADDED TASKS BY USER
@@ -65,7 +59,7 @@ client.connect(err => {
         taskChosenCollection.find({ })
             .toArray((err, documents) => {
                 console.log(documents);
-                res.send(documents);
+                res.status(200).send(documents);
             })
     })
     app.get('/addTask/:email', (req, res) => {
@@ -89,4 +83,4 @@ app.delete('/delete/:id', (req, res) => { // delete register volunteer
 
 
 
-app.listen(port)
+app.listen(process.env.PORT || port)
