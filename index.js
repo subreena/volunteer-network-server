@@ -30,16 +30,15 @@ client.connect(err => {
 
     console.log("database connected successfully");
 
-    // ADDING TASKS BY USER
-    app.post('/addTask', (req, res) => {
-        const task = req.body;
-        // console.log(task);
-        taskChosenCollection.insertOne(task)
-            .then(result => {
-                // console.log(result);
-                res.status(200).send(result.insertedCount > 0);
+   
+//   GETTING ALL TASKS
+    app.get('/allTask', (req, res) => {
+        taskCollection.find({})
+            .toArray((err, documents) => {
+                res.status(200).send(documents);
             })
     })
+    
     // ADDING TASK TO ALL TASKS
     app.post('/allTask', (req, res) => {
         const task = req.body;
@@ -50,11 +49,14 @@ client.connect(err => {
                 res.status(200).send(result.insertedCount > 0);
             })
     })
-//   GETTING ALL TASKS
-    app.get('/allTask', (req, res) => {
-        taskCollection.find({})
-            .toArray((err, documents) => {
-                res.status(200).send(documents);
+     // ADDING TASKS BY USER
+     app.post('/addTask', (req, res) => {
+        const task = req.body;
+        // console.log(task);
+        taskChosenCollection.insertOne(task)
+            .then(result => {
+                // console.log(result);
+                res.status(200).send(result.insertedCount > 0);
             })
     })
     // GETTING ADDED TASKS BY USER
