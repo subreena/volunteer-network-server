@@ -15,12 +15,7 @@ app.use(bodyParser.json());
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors())
-// enable cors
-app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});
+
 
 
 
@@ -28,7 +23,7 @@ app.get('/', (req, res) => {
     res.send('Hello from volunter-network db. Everything is fine here up to now!');
 })
 
-
+// DATBASE connection
 client.connect(err => {
     const taskCollection = client.db(`${process.env.DB_NAME}`).collection("tasks");
     const taskChosenCollection = client.db(`${process.env.DB_NAME}`).collection("taskChosen");
@@ -38,10 +33,10 @@ client.connect(err => {
     // ADDING TASKS BY USER
     app.post('/addTask', (req, res) => {
         const task = req.body;
-        console.log(task);
+        // console.log(task);
         taskChosenCollection.insertOne(task)
             .then(result => {
-                console.log(result);
+                // console.log(result);
                 res.status(200).send(result.insertedCount > 0);
             })
     })
@@ -70,6 +65,7 @@ client.connect(err => {
                 res.status(200).send(documents);
             })
     })
+    // GETTING TASK BY EMAIL
     app.get('/addTask/:email', (req, res) => {
         taskChosenCollection.find({email: req.params.email})
         .toArray( (err , documents) => {
